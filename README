@@ -4,7 +4,6 @@
 
 FriendlyMind is an innovative platform designed to address the growing need for accessible mental health support. It combines an AI-powered chatbot with a community forum, providing users with immediate, friendly support and a space to connect with peers. The chatbot offers a conversational interface for discussing mental health concerns, providing coping strategies, and suggesting resources. The community feature allows users to share experiences and support each other anonymously, fostering a sense of belonging and mutual understanding.
 
-
 ## Features
 
 ### AI Chatbot:
@@ -41,25 +40,39 @@ FriendlyMind is an innovative platform designed to address the growing need for 
 
 ## Installation
 
-1. Clone the repository:git clone https://github.com/yourusername/friendlymind.git
-cd friendlymind
+1. Clone the repository:
+    ```sh
+    git clone https://github.com/yourusername/friendlymind.git
+    cd friendlymind
+    ```
 
-2. Set up a virtual environment (recommended): python -m venv venv
-source venv/bin/activate  # On Windows use venv\Scripts\activate
+2. Set up a virtual environment (recommended):
+    ```sh
+    python -m venv venv
+    source venv/bin/activate  # On Windows use venv\Scripts\activate
+    ```
 
-3. Install required dependencies:pip install -r requirements.txt
+3. Install required dependencies:
+    ```sh
+    pip install -r requirements.txt
+    ```
+
 4. Set up the Llama 3.1 model (instructions may vary based on your specific implementation)
 
 ## Usage
 
-1. Start the application: python app.py
+1. Start the application:
+    ```sh
+    python app.py
+    ```
+
 2. Open a web browser and navigate to `http://localhost:7860` (or the port specified in the console output)
 
 3. Interact with the chatbot and community forum through the user interface
 
-# FriendlyMind Project
+## FriendlyMind Project
 
-## Mind Map
+### Mind Map
 
 ```plaintext
 FriendlyMind/
