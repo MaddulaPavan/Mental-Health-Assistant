@@ -1,1 +1,80 @@
 
+from transformers import pipeline
+import gradio as gr
+import random
+import time
+
+# Set up the text generation pipeline with Vicuna 13B
+pipe = pipeline("text-generation", model="lmsys/vicuna-13b-v1.3", device=0)  # device=0 for GPU, device=-1 for CPU
+
+def generate_response(message):
+    """
+    Uses the Vicuna 13B model to generate a response to the input message.
+    """
+    try:
+        # Generate response using the pipeline
+        prompt = f"""
+        You are a warm, caring, and understanding mental health support chatbot, just like a close friend or family member. Your role is to provide a safe, judgment-free space for discussing mental health concerns. Approach each conversation with empathy and genuine care. Instead of giving direct advice, gently guide the conversation, sharing relatable experiences and encouraging self-reflection. Your goal is to motivate, boost confidence, and help users find their inner strength.
+
+        Be an attentive listener, acknowledging emotions and validating feelings. Use a conversational tone, sprinkled with gentle humor when appropriate, to create a comfortable atmosphere. Offer support and encouragement, reminding users of their resilience and past successes. When discussing coping strategies or resources, present them as friendly suggestions or things that have helped others, rather than prescriptive advice.
+
+        While you're knowledgeable about mental health, always maintain a humble stance. Gently decline to discuss topics unrelated to mental health, and smoothly steer the conversation back to providing mental health support. If a topic is beyond your scope or requires professional intervention, gently suggest seeking help from a qualified mental health professional, framing it as a positive step towards self-care. You can use suitable emojis too.
+
+        Remember, DO NOT ANSWER ANY TOPIC Other than Mental Health. Now, respond to the following message with warmth and understanding: '{message}'
+        """
+
+        response = pipe(
+            prompt,
+            max_length=150,
+            num_return_sequences=1,
+            temperature=0.7,
+        )
+        return response[0]['generated_text']
+    except Exception as e:
+        print(f"Error: {e}")
+        return "Sorry, I'm having some trouble understanding right now. Please try again later."
+
+def respond(message, chat_history):
+    bot_message = generate_response(message)
+    chat_history.append((message, bot_message))
+    return chat_history
+
+community_messages = []
+
+def add_community_message(message):
+    timestamp = time.strftime("%H:%M:%S")
+    user_id = f"Anonymous{random.randint(1000, 9999)}"
+    formatted_message = f"[{timestamp}] {user_id}: {message}"
+    community_messages.append((formatted_message, None))
+    return "", community_messages
+
+def get_community_messages():
+    return community_messages
+
+with gr.Blocks() as demo:
+    gr.Markdown("# Friendly Mental Health Support Chatbot")
+
+    with gr.Tab("Chatbot"):
+        chatbot = gr.Chatbot()
+        msg = gr.Textbox(label="Type your message here...", placeholder="Let's chat!")
+        clear = gr.Button("Clear Chat")
+
+        def update_chat(message, chat_history):
+            updated_history = respond(message, chat_history)
+            return updated_history, ""
+
+        msg.submit(update_chat, inputs=[msg, chatbot], outputs=[chatbot, msg])
+        clear.click(lambda: [], None, chatbot, queue=False)
+
+    with gr.Tab("Community"):
+        gr.Markdown("Welcome to the Community! Chat anonymously with others. Remember to be respectful and supportive.")
+
+        community_chat = gr.Chatbot(label="Community Chat")
+        community_msg = gr.Textbox(label="Type your message here...", placeholder="Share your thoughts anonymously...")
+
+        community_msg.submit(add_community_message, inputs=[community_msg], outputs=[community_msg, community_chat])
+
+        gr.Button("Refresh Chat").click(get_community_messages, outputs=community_chat)
+
+demo.queue()
+demo.launch()
